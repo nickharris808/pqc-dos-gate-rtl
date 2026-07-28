@@ -1,0 +1,11 @@
+# prove_naive.ys — show the UNREPAIRED datapath VIOLATES `resident <= CAP` under a
+# realistic 512-byte fragment flood (yosys built-in SAT BMC over 40 cycles). A
+# violation prints "SAT proof finished - model found: FAIL!" — proving the cap in
+# bounded_reassembly.v is LOAD-BEARING (the RTL analog of the z3 "naive_violated"
+# witness), not a tautology. Run from this directory:
+#   yosys -s prove_naive.ys      (or ./verify.sh)
+read_verilog -formal -DFORMAL ../rtl/bounded_reassembly_naive.v
+prep -top bounded_reassembly_naive
+async2sync
+chformal -lower
+sat -prove-asserts -seq 40 -set-init-zero

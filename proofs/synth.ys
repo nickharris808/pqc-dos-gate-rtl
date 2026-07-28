@@ -1,0 +1,8 @@
+# synth.ys — synthesize the bounded-reassembly gate and report its gate count.
+# Run from this directory: `yosys -s synth.ys` (or ./verify.sh).
+# The FORMAL assertions are excluded (no -DFORMAL) so only the datapath is mapped.
+read_verilog ../rtl/bounded_reassembly.v
+synth -top bounded_reassembly -flatten
+stat
+ltp
+write_json bounded_reassembly.synth.json

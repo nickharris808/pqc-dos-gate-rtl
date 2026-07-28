@@ -1,0 +1,9 @@
+# prove_fault_unbounded.ys — prove (S1) resident <= CAP holds under UNBOUNDED
+# token-bypass faults (token check may be glitched high on every cycle, no fault
+# budget), by temporal k-induction over all reachable states. Strictly stronger than
+# prove_fault_gated.ys. Success => "Induction step proven: SUCCESS!".
+read_verilog -formal -DFORMAL ../rtl/bounded_reassembly_fault_unbounded.v
+prep -top bounded_reassembly_fault_unbounded
+async2sync
+chformal -lower
+sat -tempinduct -prove-asserts -set-init-zero -verify

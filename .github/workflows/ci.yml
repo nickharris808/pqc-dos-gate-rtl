@@ -1,0 +1,38 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  proofs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y yosys
+      - run: yosys -V
+      - name: Every proof must produce its expected verdict
+        run: ./verify.sh
+      - name: Synthesis reproduces 255 cells / 32 FF
+        run: |
+          cd proofs
+          yosys synth.ys | tee synth.out
+          grep -q "255 cells" synth.out || { echo "::error::cell count changed"; exit 1; }
+          grep -qE "32 +\\\$_SDFFE" synth.out || { echo "::error::flip-flop count changed"; exit 1; }
+
+  # A verifier that cannot fail is not a verifier.
+  teeth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y yosys
+      - name: Removing the capacity check must break the proof
+        run: |
+          sed -i 's|assign admit   = frag_valid & token_ok & (next_sum <= CAP);|assign admit   = frag_valid \& token_ok;|' rtl/bounded_reassembly.v
+          grep -q "assign admit   = frag_valid & token_ok;" rtl/bounded_reassembly.v \
+            || { echo "::error::mutation did not apply -- this job would pass vacuously"; exit 1; }
+          if ./verify.sh; then
+            echo "::error::verify.sh accepted an unbounded gate"
+            exit 1
+          fi
+          echo "verify.sh correctly rejected the mutated gate"

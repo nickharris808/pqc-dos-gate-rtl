@@ -1,0 +1,10 @@
+# prove_fault_admit.ys — the TEETH: sequential SAT BMC must FIND a single admit-enable
+# fault that violates (S1) resident <= CAP over 40 cycles, proving the comparator/
+# counter is the fault trusted-computing-base. A found counterexample prints
+# "SAT proof finished - model found: FAIL!" (the intended, successful teeth outcome;
+# no -verify, since a found model is what we want here).
+read_verilog -formal -DFORMAL ../rtl/bounded_reassembly_fault_admit.v
+prep -top bounded_reassembly_fault_admit
+async2sync
+chformal -lower
+sat -prove-asserts -seq 40 -set-init-zero

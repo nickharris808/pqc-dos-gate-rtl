@@ -1,0 +1,11 @@
+# prove_gated.ys — prove the REPAIRED gate's safety in HARDWARE by temporal
+# k-induction (yosys built-in SAT), UNBOUNDED over all reachable states:
+#   (S1) resident <= CAP        the bounded-buffer invariant (the line-rate DoS bound)
+#   (S2) !token_ok => !admit     the anti-clogging gate
+# A successful run prints "Induction step proven: SUCCESS!". Run from this directory:
+#   yosys -s prove_gated.ys      (or ./verify.sh)
+read_verilog -formal -DFORMAL ../rtl/bounded_reassembly.v
+prep -top bounded_reassembly
+async2sync
+chformal -lower
+sat -tempinduct -prove-asserts -set-init-zero -verify
