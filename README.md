@@ -10,6 +10,8 @@ to "which gates do I actually have to protect?"**
 
 32 flip-flops. Five Yosys proofs you can re-run in about a minute.
 
+**📖 Full documentation, tutorial and conceptual guide: <https://nickharris808.github.io/pqc-toolkit/>**
+
 ---
 
 ## The interesting result is the fault isolation
