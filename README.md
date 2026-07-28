@@ -2,13 +2,13 @@
 
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![proofs](https://img.shields.io/badge/formal%20proofs-5-brightgreen.svg)](proofs/)
-[![cells](https://img.shields.io/badge/synthesis-255%20cells%20%2F%2032%20FF-blue.svg)](proofs/synth.ys)
+[![flipflops](https://img.shields.io/badge/synthesis-32%20flip--flops-blue.svg)](proofs/synth.ys)
 [![solver](https://img.shields.io/badge/k--induction-unbounded-brightgreen.svg)](#)
 
 **A synthesizable admission gate with a proven memory bound — and a measured answer
 to "which gates do I actually have to protect?"**
 
-255 cells. 32 flip-flops. Five Yosys proofs you can re-run in about a minute.
+32 flip-flops. Five Yosys proofs you can re-run in about a minute.
 
 ---
 
@@ -81,9 +81,16 @@ length is a 33-bit sum.
 cd proofs && yosys synth.ys
 ```
 
-Reproduces **255 cells** and **32 flip-flops** (`$_SDFFE_PP0P_`) for the datapath
-with formal assertions excluded. Both numbers come from running the script; no
-area figure is quoted here because this flow does no liberty mapping.
+Reproduces **32 flip-flops** (`$_SDFFE_PP0P_`) for the datapath with formal
+assertions excluded — one per bit of the 32-bit residency counter. CI asserts
+that number on every push.
+
+**The cell count is version-dependent and is deliberately not claimed as a fixed
+figure.** The same script gives 255 cells under Yosys 0.61 and 232 under 0.48,
+because the technology-independent mapping changes between releases. An earlier
+draft of this README quoted 255 as though it were a property of the design; it is
+a property of the design *and* the toolchain. No area figure is quoted either,
+since this flow does no liberty mapping.
 
 ## Honest scope
 

@@ -19,12 +19,16 @@ jobs:
       - run: yosys -V
       - name: Every proof must produce its expected verdict
         run: ./verify.sh
-      - name: Synthesis reproduces 255 cells / 32 FF
+      # The flip-flop count is a property of the design (one per bit of the 32-bit
+      # residency counter) and is stable across Yosys releases. The CELL count is
+      # not: 255 under 0.61, 232 under 0.48. Asserting it would pin the design to
+      # one toolchain build, so only the meaningful number is checked.
+      - name: Synthesis reproduces 32 flip-flops
         run: |
           cd proofs
           yosys synth.ys | tee synth.out
-          grep -q "255 cells" synth.out || { echo "::error::cell count changed"; exit 1; }
           grep -qE "32 +\\\$_SDFFE" synth.out || { echo "::error::flip-flop count changed"; exit 1; }
+          grep -qE "Number of cells: +[0-9]+" synth.out || { echo "::error::no cell count reported"; exit 1; }
 
   teeth:
     runs-on: ubuntu-latest
