@@ -27,7 +27,11 @@ jobs:
         run: |
           cd proofs
           yosys synth.ys | tee synth.out
-          grep -qE "32 +\\\$_SDFFE" synth.out || { echo "::error::flip-flop count changed"; exit 1; }
+          # Yosys prints the stat table as "32  $_SDFFE_..." in some releases and
+          # "$_SDFFE_...  32" in others, so match the line and then the number
+          # rather than assuming a column order.
+          grep '\$_SDFFE' synth.out | grep -qw 32 \
+            || { echo "::error::flip-flop count is not 32"; grep '\$_SDFFE' synth.out; exit 1; }
           grep -qE "Number of cells: +[0-9]+" synth.out || { echo "::error::no cell count reported"; exit 1; }
 
   teeth:
