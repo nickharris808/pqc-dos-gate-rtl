@@ -4,12 +4,18 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Yosys phrases its verdicts differently across versions ("Induction step proven:
+# SUCCESS!"), and `sat` exits 0 whether it proves or refutes -- so the verdict can
+# only be read from the output text. Ubuntu ships Yosys 0.33, which does not match
+# the phrasing this repo was developed against, so CI pins the OSS CAD Suite build
+# rather than guessing at every distribution's wording.
 jobs:
   proofs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y yosys
+      - uses: YosysHQ/setup-oss-cad-suite@v3
+        with: { version: '2025-01-01' }
       - run: yosys -V
       - name: Every proof must produce its expected verdict
         run: ./verify.sh
@@ -20,17 +26,23 @@ jobs:
           grep -q "255 cells" synth.out || { echo "::error::cell count changed"; exit 1; }
           grep -qE "32 +\\\$_SDFFE" synth.out || { echo "::error::flip-flop count changed"; exit 1; }
 
-  # A verifier that cannot fail is not a verifier.
   teeth:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y yosys
+      - uses: YosysHQ/setup-oss-cad-suite@v3
+        with: { version: '2025-01-01' }
       - name: Removing the capacity check must break the proof
         run: |
+          # Assert the suite is GREEN first. Without this the job passes whenever
+          # verify.sh fails for any reason at all -- which is exactly what happened
+          # when CI ran a Yosys whose verdict wording did not match.
+          ./verify.sh || { echo "::error::baseline is not green; teeth test would be vacuous"; exit 1; }
+
           sed -i 's|assign admit   = frag_valid & token_ok & (next_sum <= CAP);|assign admit   = frag_valid \& token_ok;|' rtl/bounded_reassembly.v
           grep -q "assign admit   = frag_valid & token_ok;" rtl/bounded_reassembly.v \
-            || { echo "::error::mutation did not apply -- this job would pass vacuously"; exit 1; }
+            || { echo "::error::mutation did not apply"; exit 1; }
+
           if ./verify.sh; then
             echo "::error::verify.sh accepted an unbounded gate"
             exit 1
