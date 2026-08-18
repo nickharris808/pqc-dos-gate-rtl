@@ -1,5 +1,6 @@
 # pqc-dos-gate-rtl
 
+[![ci](https://github.com/nickharris808/pqc-dos-gate-rtl/actions/workflows/ci.yml/badge.svg)](https://github.com/nickharris808/pqc-dos-gate-rtl/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![proofs](https://img.shields.io/badge/formal%20proofs-5-brightgreen.svg)](proofs/)
 [![flipflops](https://img.shields.io/badge/synthesis-32%20flip--flops-blue.svg)](proofs/synth.ys)
@@ -127,7 +128,7 @@ The same bound, checked three independent ways:
 |---|---|
 | **here** | Yosys k-induction on synthesizable RTL |
 | [`pqc-bounds-lean`](https://github.com/nickharris808/pqc-bounds-lean) | Lean 4, mathlib-free, 0 `sorry` |
-| [`farkas-check`](https://github.com/nickharris808/farkas-check) | 123 lines of integer C, on-device |
+| [`farkas-check`](https://github.com/nickharris808/farkas-check) | 216 lines of integer C (132 non-blank, non-comment), on-device |
 
 [`pqc-sizes`](https://github.com/nickharris808/pqc-sizes) derives the cap ·
 [`pqc-dos-embedded`](https://github.com/nickharris808/pqc-dos-embedded) shows the
