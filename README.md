@@ -135,8 +135,7 @@ The same bound, checked three independent ways:
 failure on emulated ARMv7-M
 
 This is one gate. The full post-quantum migration failure surface is a separate
-closed codebase, and relevant subject matter is covered by a filed provisional
-patent application. For commercial use, open a GitHub Discussion or an issue.
+closed codebase, and patent claims have been drafted for relevant subject matter (filing status available on request). For commercial use, open a GitHub Discussion or an issue.
 
 ## License
 
